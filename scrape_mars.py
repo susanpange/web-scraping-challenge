@@ -1,7 +1,6 @@
 from splinter import Browser
 from bs4 import BeautifulSoup
 import pandas as pd
-import requests
 
 
 def init_browser():
@@ -14,10 +13,13 @@ def scrape():
     listings = {}
 
     news_url = 'https://mars.nasa.gov/news/'
-    news_response = requests.get(news_url)
-    news_soup = BeautifulSoup(news_response.text, 'html.parser')
-    news_title = news_soup.find('div', class_='content_title').find('a').text.strip()
-    news_p = news_soup.find('div', class_='rollover_description_inner').text.strip()
+    browser.visit(news_url)
+    news_html = browser.html
+    news_soup = BeautifulSoup(news_html, 'html.parser')
+    news_title = news_soup.find('li', class_='slide').find('div', class_='content_title').text
+    news_p = news_soup.find('li', class_='slide').find('div', class_='rollover_description_inner').text
+
+    
 
     featured_image_url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
     browser.visit(featured_image_url)
@@ -36,8 +38,8 @@ def scrape():
     fact_table_html.replace('\n', '')
 
     mars_hemi_url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
-    mars_hemi_response = requests.get(mars_hemi_url)
-    mars_hemi_soup = BeautifulSoup(mars_hemi_response.text, 'html.parser')
+    browser.visit(mars_hemi_url)
+    mars_hemi_soup = BeautifulSoup(browser.html, 'html.parser')
     hemi_image_urls = []
     results = mars_hemi_soup.find_all('div', class_='item')
     
